@@ -1026,6 +1026,86 @@
           }
         }
       }
+    },
+    "/{approvalId}": {
+      "get": {
+        "tags": [
+          "GetRoleAssignmentApprovalById"
+        ],
+        "operationId": "RoleAssignmentApproval_GetById",
+        "x-ms-examples": {
+          "GetAccessReviews": {
+            "$ref": "./examples/GetRoleAssignmentApprovalById.json"
+          }
+        },
+        "description": "Get role assignment approval.",
+        "parameters": [
+          {
+            "name": "approvalId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The id of the role assignment approval."
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Describe the result of a successful operation.",
+            "schema": {
+              "$ref": "#/definitions/RoleAssignmentApproval"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorDefinition"
+            }
+          }
+        }
+      }
+    },
+    "/{approvalStepId}": {
+      "get": {
+        "tags": [
+          "GetRoleAssignmentApprovalStepById"
+        ],
+        "operationId": "RoleAssignmentApprovalStep_GetById",
+        "x-ms-examples": {
+          "GetAccessReviews": {
+            "$ref": "./examples/GetRoleAssignmentApprovalStepById.json"
+          }
+        },
+        "description": "Get role assignment approval.",
+        "parameters": [
+          {
+            "name": "stepId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The id of the role assignment approval step."
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Describe the result of a successful operation.",
+            "schema": {
+              "$ref": "#/definitions/RoleAssignmentApprovalStep"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorDefinition"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1678,6 +1758,152 @@
         }
       },
       "description": "List of access review decisions."
+    },
+    "RoleAssignmentApproval": {
+      "x-ms-azure-resource": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The role assignment approval id."
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The role assignment approval unique id."
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The resource type."
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/RoleAssignmentApprovalProperties",
+          "description": "Role Assignment Approval properties."
+        }
+      },
+      "description": "Role Assignment Approval."
+    },
+    "RoleAssignmentApprovalProperties": {
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoleAssignmentApprovalStep"
+          },
+          "description": "This is the collection of steps returned when one does an expand on it."
+        }
+      },
+      "description": "Role Assignment Approval properties."
+    },
+    "RoleAssignmentApprovalStep": {
+      "x-ms-azure-resource": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The role assignment approval step id."
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The role assignment approval step name."
+        },
+        "type": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The resource type."
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/RoleAssignmentApprovalStepProperties",
+          "description": "Role Assignment Approval Step properties."
+        }
+      },
+      "description": "Role assignment approval step properties."
+    },
+    "RoleAssignmentApprovalStepProperties": {
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "The display name for the approval step."
+        },
+        "status": {
+          "type": "string",
+          "readOnly": true,
+          "description": "This read-only field specifies the status of an approval.",
+          "enum": [
+            "NotStarted",
+            "InProgress",
+            "Completed",
+            "Expired",
+            "Initializing",
+            "Escalating",
+            "Completing",
+            "Escalated"
+          ],
+          "x-ms-enum": {
+            "name": "RoleAssignmentApprovalStepStatus",
+            "modelAsString": true
+          }
+        },
+        "isAssignedToMe": {
+          "description": "Indicates whether the step is assigned to me for review",
+          "type": "boolean"
+        },
+        "target": {
+          "readOnly": true,
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/AccessReviewDecisionTarget",
+          "description": "Target of this decision record. Can be UserDecisionTarget or ServicePrincipalDecisionTarget"
+        },
+        "recommendation": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The feature- generated recommendation shown to the reviewer.",
+          "enum": [
+            "Approve",
+            "Deny",
+            "NoInfoAvailable"
+          ],
+          "x-ms-enum": {
+            "name": "AccessRecommendationType",
+            "modelAsString": true
+          }
+        },
+        "reviewedBy": {
+          "readOnly": true,
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/AccessReviewActorIdentity",
+          "description": "Details of the approver."
+        },
+        "reviewedDateTime": {
+          "type": "string",
+          "readOnly": true,
+          "format": "date-time",
+          "description": "Date Time when a decision was taken.",
+          "x-nullable": false
+        },
+        "reviewResult": {
+          "type": "string",
+          "description": "The decision on the approval step. This value is initially set to NotReviewed. Approvers can take action of Approve/Deny",
+          "enum": [
+            "Approve",
+            "Deny",
+            "NotReviewed"
+          ],
+          "x-ms-enum": {
+            "name": "RoleAssignmentApprovalStepReviewResult",
+            "modelAsString": true
+          }
+        },
+        "justification": {
+          "type": "string",
+          "description": "Justification provided by approvers for their action"
+        }
+      },
+      "description": "Approval Step."
     },
     "ErrorDefinition": {
       "type": "object",
